@@ -1,0 +1,74 @@
+name: Release Matter Desktop
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & Package (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm --prefix server install
+          npm --prefix client install
+
+      - name: Run Tests
+        run: npm --prefix server test
+
+      - name: Build Web Client & Server
+        run: npm run build
+
+      - name: Generate App Icons
+        run: npm run icons
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools libfuse2
+
+      - name: Build & Package Desktop App
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            npm run package:win
+          elif [ "${{ runner.os }}" = "macOS" ]; then
+            npm run package:mac
+          else
+            npm run package:linux
+          fi
+        shell: bash
+
+      - name: Upload Release Assets to GitHub
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: release/*
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

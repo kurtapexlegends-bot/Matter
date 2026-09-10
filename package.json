@@ -1,0 +1,90 @@
+{
+  "name": "matter",
+  "productName": "Matter",
+  "version": "1.1.0",
+  "description": "Matter — Ultra-Minimalist Multi-Terminal Agent Platform & Inter-Agent Coordination Desktop App",
+  "main": "electron/main.cjs",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "desktop": "electron .",
+    "desktop:dev": "concurrently -k \"npm --prefix server run dev\" \"npm --prefix client run dev\" \"electron .\"",
+    "build": "npm --prefix server run build && npm --prefix client run build",
+    "build:desktop": "npm run build && node electron/generate-icons.cjs && electron-builder --dir",
+    "package:win": "npm run build && node electron/generate-icons.cjs && electron-builder --win",
+    "package:mac": "npm run build && node electron/generate-icons.cjs && electron-builder --mac",
+    "package:linux": "npm run build && node electron/generate-icons.cjs && electron-builder --linux",
+    "package:all": "npm run build && node electron/generate-icons.cjs && electron-builder -mwl",
+    "start": "npm --prefix server run start",
+    "test": "npm --prefix server test",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "icons": "node electron/generate-icons.cjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^34.3.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.matter.app",
+    "productName": "Matter",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "client/dist/**/*",
+      "server/dist/**/*",
+      "server/bin/**/*",
+      "server/node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "electron/assets/icon.ico",
+      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Matter"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "icon": "electron/assets/icon.png",
+      "category": "public.app-category.developer-tools",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "electron/assets/icon.png",
+      "category": "Development",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    }
+  },
+  "keywords": [
+    "ai-agent",
+    "terminal",
+    "pty",
+    "multi-terminal",
+    "desktop",
+    "electron",
+    "coordination",
+    "matter"
+  ],
+  "author": "Google DeepMind Pair Programming",
+  "license": "MIT"
+}
