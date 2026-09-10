@@ -114,6 +114,11 @@ const SWARM_PRESETS: SwarmPreset[] = [
 
 // --- REST API Endpoints ---
 
+// Health check
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.json({ status: 'ok', uptime: process.uptime(), agents: globalPtyManager.listSessions().length });
+});
+
 // Agents
 app.get('/api/agents', (req: Request, res: Response) => {
   res.json(globalPtyManager.listSessions());

@@ -153,174 +153,91 @@ export const TerminalWorkspace: React.FC<TerminalWorkspaceProps> = ({
     setQuickCmdInput('');
   };
 
-  // If no agents are active -> Render rich Matter Studio Hub
+  // If no agents are active -> Render sleek minimalist developer cockpit
   if (agents.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-start p-6 md:p-10 bg-obsidian-950 text-slate-100 overflow-y-auto cyber-grid-bg select-none font-sans">
-        <div className="max-w-4xl w-full flex flex-col items-center">
-          {/* Header Brand */}
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyber-indigo via-cyber-purple to-cyber-cyan flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Layers className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold tracking-tight text-slate-100 font-sans">
-                Matter Terminal Studio
-              </h2>
-              <p className="text-xs text-slate-400 font-sans">
-                Isolated, multi-agent workspace with real-time inter-agent messaging and zero conflicts.
-              </p>
-            </div>
+      <div className="flex-1 flex flex-col items-center justify-center p-6 bg-[#07090e] text-slate-100 select-none font-sans">
+        <div className="max-w-xl w-full flex flex-col items-center text-center">
+          {/* Brand Mark */}
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyber-indigo via-purple-600 to-cyber-cyan flex items-center justify-center shadow-lg shadow-indigo-500/20 mb-3">
+            <Terminal className="w-5 h-5 text-white" />
           </div>
+
+          <h2 className="text-base font-semibold tracking-tight text-slate-200 font-sans mb-1">
+            Matter Terminal Workspace
+          </h2>
+          <p className="text-xs text-slate-500 font-sans mb-6">
+            Multi-agent terminal harness with isolated worktrees and live message bus.
+          </p>
 
           {/* Quick Launch Command Bar */}
           <form
             onSubmit={handleQuickCmdSubmit}
-            className="w-full max-w-2xl flex items-center gap-2 my-6 p-1.5 bg-obsidian-900 border border-white/[0.12] rounded-xl shadow-xl shadow-black/50 focus-within:border-cyber-indigo/80 transition-all"
+            className="w-full flex items-center gap-2 mb-4 p-1.5 bg-[#0b0e15] border border-white/[0.1] rounded-xl shadow-xl shadow-black/60 focus-within:border-cyber-indigo/60 transition-all"
           >
-            <div className="flex items-center gap-2 pl-3 text-slate-500 font-mono text-xs">
-              <Terminal className="w-4 h-4 text-cyber-indigo" />
-              <span>PS &gt;</span>
+            <div className="flex items-center gap-1.5 pl-3 text-cyber-indigo font-mono text-xs">
+              <span className="text-cyber-indigo font-bold">❯_</span>
             </div>
             <input
               type="text"
               value={quickCmdInput}
               onChange={(e) => setQuickCmdInput(e.target.value)}
-              placeholder="Type any command, CLI agent or shell (e.g. powershell, claude, gemini, python)..."
-              className="flex-1 bg-transparent px-2 py-1.5 text-xs text-slate-100 font-mono placeholder-slate-500 focus:outline-none"
+              placeholder="Launch shell or agent (e.g. powershell, claude, gemini)..."
+              className="flex-1 bg-transparent px-2 py-1.5 text-xs text-slate-200 font-mono placeholder-slate-600 focus:outline-none"
+              autoFocus
             />
             <button
               type="submit"
               disabled={!quickCmdInput.trim()}
-              className="flex items-center gap-1 px-3.5 py-1.5 bg-cyber-indigo hover:bg-cyber-indigo/90 disabled:opacity-40 text-white rounded-lg text-xs font-semibold shadow-sm transition-all"
+              className="flex items-center gap-1 px-3 py-1.5 bg-cyber-indigo hover:bg-cyber-indigo/90 disabled:opacity-30 text-white rounded-lg text-xs font-mono transition-all shrink-0"
             >
               <span>Launch</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3 h-3" />
             </button>
           </form>
 
-          {/* Section 1: Quick Agent Spawn Tiles */}
-          <div className="w-full mb-6">
-            <div className="flex items-center justify-between mb-3 px-1">
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                1-CLICK AGENT LAUNCHERS
-              </span>
+          {/* 1-Click Fast Launcher Pills */}
+          <div className="flex flex-wrap items-center justify-center gap-1.5 mb-8">
+            {QUICK_AGENTS.map((qa) => (
+              <button
+                key={qa.name}
+                onClick={() => {
+                  sound.playSuccess();
+                  onSpawnQuickAgent({
+                    id: `${qa.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now().toString(36).slice(-4)}`,
+                    name: qa.name,
+                    role: qa.role,
+                    color: qa.color,
+                    shell: qa.shell,
+                  });
+                }}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-[#0d1017] hover:bg-[#141824] border border-white/[0.08] hover:border-white/[0.18] rounded-lg text-xs text-slate-300 transition-all"
+              >
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: qa.color }} />
+                <span className="font-mono text-[11px]">{qa.name}</span>
+              </button>
+            ))}
+
+            {presets.length > 0 && (
               <button
                 onClick={() => {
-                  sound.playClick();
-                  onOpenNewAgent();
+                  sound.playSuccess();
+                  onLaunchPreset(presets[0].id);
                 }}
-                className="text-xs font-medium text-cyber-indigo hover:text-cyber-indigo/80 flex items-center gap-1"
+                className="flex items-center gap-1 px-2.5 py-1 bg-cyber-indigo/10 hover:bg-cyber-indigo/20 border border-cyber-indigo/30 rounded-lg text-xs text-cyber-indigo transition-all font-mono text-[11px]"
               >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Custom Config</span>
+                <Sparkles className="w-3 h-3" />
+                <span>Pair Swarm</span>
               </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {QUICK_AGENTS.map((qa) => (
-                <div
-                  key={qa.name}
-                  onClick={() => {
-                    sound.playSuccess();
-                    onSpawnQuickAgent({
-                      id: `${qa.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now().toString(36).slice(-4)}`,
-                      name: qa.name,
-                      role: qa.role,
-                      color: qa.color,
-                      shell: qa.shell,
-                    });
-                  }}
-                  className="p-3.5 bg-obsidian-900 border border-white/[0.08] hover:border-white/[0.18] rounded-xl cursor-pointer transition-all hover:scale-[1.02] shadow-sm flex flex-col justify-between group"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: qa.color }} />
-                        <span className="font-bold text-xs text-slate-100 font-sans">{qa.name}</span>
-                      </div>
-                      {qa.icon}
-                    </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed font-sans mb-3">
-                      {qa.desc}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-white/[0.05] text-[10px] font-mono text-slate-500 group-hover:text-cyber-indigo">
-                    <span>{qa.role}</span>
-                    <span className="flex items-center gap-0.5">
-                      <span>Spawn</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            )}
           </div>
 
-          {/* Section 2: Preset Swarms Gallery */}
-          <div className="w-full mb-8">
-            <div className="flex items-center justify-between mb-3 px-1">
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                COORDINATED SWARM PRESETS
-              </span>
-              <button
-                onClick={() => {
-                  sound.playClick();
-                  onOpenPresets();
-                }}
-                className="text-xs font-medium text-cyber-amber hover:text-cyber-amber/80 flex items-center gap-1"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Browse All</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {presets.map((preset) => (
-                <div
-                  key={preset.id}
-                  onClick={() => {
-                    sound.playSuccess();
-                    onLaunchPreset(preset.id);
-                  }}
-                  className="p-3.5 bg-obsidian-900 border border-white/[0.08] hover:border-cyber-indigo/40 rounded-xl cursor-pointer transition-all hover:scale-[1.02] shadow-sm flex flex-col justify-between group"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="font-bold text-xs text-slate-100 font-sans truncate">{preset.name}</span>
-                      <span className="text-[9px] font-mono text-cyber-indigo bg-cyber-indigo/10 border border-cyber-indigo/30 px-1.5 py-0.2 rounded-full">
-                        {preset.agents.length} AGENTS
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 leading-relaxed font-sans mb-3 line-clamp-2">
-                      {preset.description}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-white/[0.05] text-[10px] text-slate-400 group-hover:text-cyber-indigo font-medium font-sans">
-                    <span>1-Click Deploy</span>
-                    <Play className="w-3 h-3" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Desktop Keyboard Shortcuts strip */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-[11px] text-slate-500 font-mono pt-4 border-t border-white/[0.06]">
-            <span className="flex items-center gap-1.5">
-              <kbd className="px-1.5 py-0.2 bg-obsidian-900 border border-white/[0.1] rounded text-[10px]">⌘K</kbd> Command Palette
-            </span>
-            <span className="flex items-center gap-1.5">
-              <kbd className="px-1.5 py-0.2 bg-obsidian-900 border border-white/[0.1] rounded text-[10px]">⌘N</kbd> Spawn Agent
-            </span>
-            <span className="flex items-center gap-1.5">
-              <kbd className="px-1.5 py-0.2 bg-obsidian-900 border border-white/[0.1] rounded text-[10px]">⌘B</kbd> Toggle Sidebar
-            </span>
-            <span className="flex items-center gap-1.5">
-              <kbd className="px-1.5 py-0.2 bg-obsidian-900 border border-white/[0.1] rounded text-[10px]">⌘J</kbd> Broadcast Prompt
-            </span>
+          {/* Desktop Keyboard Hints */}
+          <div className="flex items-center gap-4 text-[10px] text-slate-600 font-mono">
+            <span><kbd className="px-1 py-0.2 bg-white/[0.04] border border-white/[0.08] rounded">⌘K</kbd> Palette</span>
+            <span><kbd className="px-1 py-0.2 bg-white/[0.04] border border-white/[0.08] rounded">⌘N</kbd> New</span>
+            <span><kbd className="px-1 py-0.2 bg-white/[0.04] border border-white/[0.08] rounded">⌘B</kbd> Drawer</span>
+            <span><kbd className="px-1 py-0.2 bg-white/[0.04] border border-white/[0.08] rounded">⌘J</kbd> Prompt</span>
           </div>
         </div>
       </div>

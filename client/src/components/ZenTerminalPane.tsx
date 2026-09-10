@@ -71,7 +71,12 @@ export const ZenTerminalPane: React.FC<ZenTerminalPaneProps> = ({
         brightWhite: '#ffffff',
       },
       allowTransparency: true,
-      scrollback: 5000,
+      scrollback: 1000,
+      fastScrollModifier: 'alt',
+      windowsPty: {
+        backend: 'conpty',
+        buildNumber: 19041,
+      },
     });
 
     const fitAddon = new FitAddon();

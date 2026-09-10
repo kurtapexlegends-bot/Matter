@@ -208,7 +208,7 @@ export class PtyManager extends EventEmitter {
       info,
       ptyProcess,
       outputBuffer: [],
-      maxBufferSize: 2000,
+      maxBufferSize: 1000,
       autoApprove: isAutoApprove,
       lineAccumulator: '',
       lastAutoApprovedAt: 0,
@@ -224,7 +224,7 @@ export class PtyManager extends EventEmitter {
     ptyProcess.onData((data: string) => {
       session.outputBuffer.push(data);
       if (session.outputBuffer.length > session.maxBufferSize) {
-        session.outputBuffer.shift();
+        session.outputBuffer = session.outputBuffer.slice(-session.maxBufferSize);
       }
       this.emit('data', { agentId: id, data });
 

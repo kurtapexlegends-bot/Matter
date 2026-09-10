@@ -5,13 +5,27 @@
  */
 
 const getBaseUrls = () => {
+  const isDesktop =
+    window.location.protocol === 'file:' ||
+    (typeof window !== 'undefined' && Boolean((window as any).matterDesktop?.isDesktop));
+
+  if (isDesktop) {
+    return {
+      primaryApi: 'http://127.0.0.1:3001/api',
+      fallbackApi: 'http://localhost:3001/api',
+      primaryWs: 'ws://127.0.0.1:3001/ws',
+      fallbackWs: 'ws://localhost:3001/ws',
+      isDev: false,
+    };
+  }
+
   const isDev = window.location.port !== '3001' && window.location.port !== '';
   const primaryApi = '/api';
-  const fallbackApi = 'http://localhost:3001/api';
+  const fallbackApi = 'http://127.0.0.1:3001/api';
 
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const primaryWs = `${protocol}//${window.location.host}/ws`;
-  const fallbackWs = 'ws://localhost:3001/ws';
+  const fallbackWs = 'ws://127.0.0.1:3001/ws';
 
   return { primaryApi, fallbackApi, primaryWs, fallbackWs, isDev };
 };

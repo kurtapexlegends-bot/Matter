@@ -41,6 +41,12 @@
       "server/node_modules/**/*",
       "package.json"
     ],
+    "asar": true,
+    "asarUnpack": [
+      "server/**/*",
+      "**/node-pty/**/*",
+      "**/*.node"
+    ],
     "win": {
       "target": [
         {

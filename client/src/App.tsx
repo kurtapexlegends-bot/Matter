@@ -51,6 +51,7 @@ export const App: React.FC = () => {
 
   const wsRef = useRef<WebSocket | null>(null);
   const broadcastInputRef = useRef<HTMLInputElement>(null);
+  const hasAutoSpawnedRef = useRef<boolean>(false);
 
   // Global Keyboard Shortcuts
   useEffect(() => {
@@ -117,10 +118,24 @@ export const App: React.FC = () => {
           try {
             const msg = JSON.parse(event.data);
             switch (msg.type) {
-              case 'init':
-                setAgents(msg.payload.agents || []);
-                if (msg.payload.agents && msg.payload.agents.length > 0) {
-                  setActiveAgentId(msg.payload.agents[0].id);
+              case 'init': {
+                const initialAgents = msg.payload.agents || [];
+                setAgents(initialAgents);
+                if (initialAgents.length > 0) {
+                  setActiveAgentId(initialAgents[0].id);
+                } else if (!hasAutoSpawnedRef.current) {
+                  hasAutoSpawnedRef.current = true;
+                  apiRequest('/agents', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                      id: 'terminal-1',
+                      name: 'Terminal 1',
+                      role: 'System Terminal',
+                      color: '#6366f1',
+                      shell: 'powershell.exe',
+                      autoApprove: true,
+                    }),
+                  }).catch(() => {});
                 }
                 setMessages(msg.payload.messages || []);
                 setBlackboard(msg.payload.blackboard || []);
@@ -128,6 +143,7 @@ export const App: React.FC = () => {
                 setTasks(msg.payload.tasks || []);
                 setPresets(msg.payload.presets || []);
                 break;
+              }
 
               case 'agent:created':
                 sound.playSuccess();
